@@ -38,3 +38,13 @@ _Hint_ - Use [nodemon](https://www.npmjs.com/package/nodemon) instead of `node` 
 - Note - submodule for `secp256k1` https://github.com/paulmillr/noble-secp256k1
 
 - NOTE - to run scripts on the server `node scripts/generate.js`
+
+- Next step to complete 
+- Make it so that you can send a signed transaction to the server
+- The server should recover the public key from the signature 
+- Only allow the transaction if a valid public key which owns those funds
+- Inside of the send method on the server - ```index.js``` 
+- Get a signature from the client side application 
+- Recover the public address from the signature - this is the sender
+- Address can only have originated from the person with the private key
+
