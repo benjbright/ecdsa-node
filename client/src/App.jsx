@@ -18,7 +18,11 @@ function App() {
         address={address}
         setAddress={setAddress}
       />
-      <Transfer setBalance={setBalance} address={address} />
+      <Transfer
+        setBalance={setBalance}
+        address={address}
+        privateKey={privateKey}
+      />
       {/* Transfer function should eventually take the private key to generate a signed transaction - a signature.  The server can then derive the address from the signature */}
     </div>
   )

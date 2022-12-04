@@ -30,7 +30,7 @@ function Wallet({
   }
 
   // Hash the msg
-  const message = "Alchemy University"
+  const message = toString(10)
   const bytes = utf8ToBytes(message)
   const hash = keccak256(bytes)
   // console.log(hash)
@@ -41,16 +41,11 @@ function Wallet({
     "45e7381c1ff23d18dc2cad94c10b1ee6e0f379a4258ba1fb894ee8972da1ae12"
 
   async function signMessage(msg) {
-    const signature = await secp.sign(msg, PRIVATE_KEY, { recovered: true })
+    const signature = await secp.sign(msg, privateKey, { recovered: true })
     console.log(signature)
 
     return signature
   }
-
-  // const signatureArray = signMessage(hash)
-  // console.log(signatureArray)
-  // const signature = signatureArray[0]
-  // const recoveryBit = signatureArray[1]
 
   // Recover the public key
   async function recoverKey(msg) {
@@ -58,8 +53,14 @@ function Wallet({
     const signature = signatureArray[0]
     const recoveryBit = signatureArray[1]
 
-    const publicKey = await secp.recoverPublicKey(msg, signature, recoveryBit)
+    const publicKey = secp.recoverPublicKey(msg, signature, recoveryBit)
     console.log(toHex(publicKey))
+
+    // Public key to address
+    const address = publicKey.slice(1)
+    const keyHash = keccak256(address)
+    const ethAddress = keyHash.slice(-20)
+    // console.log(toHex(ethAddress))
 
     return publicKey
   }
@@ -81,7 +82,7 @@ function Wallet({
         ></input>
       </label>
 
-      <div>Address: {address.slice(0, 10)}...</div>
+      {/* <div>Address: {address.slice(0, 10)}...</div> */}
 
       <div className="balance">Balance: {balance}</div>
     </div>

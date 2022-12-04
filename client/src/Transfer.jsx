@@ -1,26 +1,56 @@
-import { useState } from "react";
-import server from "./server";
+import { useState } from "react"
+import server from "./server"
+import * as secp from "ethereum-cryptography/secp256k1"
+import { toHex, utf8ToBytes } from "ethereum-cryptography/utils"
+import { keccak256 } from "ethereum-cryptography/keccak"
 
-function Transfer({ address, setBalance }) {
-  const [sendAmount, setSendAmount] = useState("");
-  const [recipient, setRecipient] = useState("");
+function Transfer({ address, setBalance, privateKey }) {
+  const [sendAmount, setSendAmount] = useState("")
+  const [recipient, setRecipient] = useState("")
 
-  const setValue = (setter) => (evt) => setter(evt.target.value);
+  // const [msgHash, setMsgHash] = useState()
+
+  const setValue = (setter) => (evt) => setter(evt.target.value)
+
+  let hash
+
+  async function generateSignature(msg) {
+    const stringMsg = toString(msg)
+    // Step one - hash the msg
+    const bytes = utf8ToBytes(stringMsg)
+    hash = keccak256(bytes)
+    // setMsgHash(hash)
+    console.log(privateKey)
+    // console.log(hash)
+
+    // Step two - sign the message with private key
+    const signature = await secp.sign(hash, privateKey, {
+      recovered: true,
+    })
+
+    return signature
+  }
 
   async function transfer(evt) {
-    evt.preventDefault();
+    evt.preventDefault()
+
+    const sender = await generateSignature(sendAmount)
+    console.log(sender)
+    console.log(sendAmount)
+    console.log(hash)
 
     try {
       const {
         data: { balance },
       } = await server.post(`send`, {
-        sender: address,
+        sender: sender,
         amount: parseInt(sendAmount),
         recipient,
-      });
-      setBalance(balance);
+        hash,
+      })
+      setBalance(balance)
     } catch (ex) {
-      alert(ex.response.data.message);
+      alert(ex.response.data.message)
     }
   }
 
@@ -48,7 +78,7 @@ function Transfer({ address, setBalance }) {
 
       <input type="submit" className="button" value="Transfer" />
     </form>
-  );
+  )
 }
 
-export default Transfer;
+export default Transfer
